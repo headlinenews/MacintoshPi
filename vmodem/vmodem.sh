@@ -14,8 +14,6 @@
 # Virtual Modem - auto-compile/install script
 # -------------------------------------------
 
-BDIR=~/vmodem-build
-
 printf "\e[92m"; echo '
 ** MacintoshPi
 __     ___      _               _    __  __           _                
@@ -25,16 +23,29 @@ __     ___      _               _    __  __           _
    \_/  |_|_|   \__|\__,_|\__,_|_|  |_|  |_|\___/ \__,_|\___|_| |_| |_|
                                                                           
 '; printf "\e[0m"; sleep 2
-source ./assets/func.sh
+source ../assets/func.sh
 updateinfo
-sudo apt install -y tcpser raspberrypi-kernel-headers build-essential
-[ $? -ne 0 ] && net_error "VICE apt packages"
-mkdir $BDIR && cd $BDIR
-wget https://github.com/freemed/tty0tty/archive/refs/tags/1.2.tar.gz -O ${BDIR}/tty0tty-1.2.tar.gz
+sudo apt install -y raspberrypi-kernel-headers build-essential
+[ $? -ne 0 ] && net_error "Virutal Modem apt packages"
+Base_dir
+Src_dir
+
+# Installation of tcpser.
+wget ${TCPSER_SOURCE} -O ${SRC_DIR}/tcpser-${TCPSER_VERSION}.tar.gz
+[ $? -ne 0 ] && net_error "tcpser sources"
+cd ${SRC_DIR}
+tar zxf tcpser-${TCPSER_VERSION}.tar.gz
+cd tcpser-${TCPSER_VERSION}
+make
+sudo cp tcpser /usr/local/bin/
+sudo chmod 655 /usr/local/bin/tcpser
+
+# Installation of tty0tty.
+wget ${TTY0TTY_SOURCE} -O ${SRC_DIR}/tty0tty-${TTY0TTY_VERSION}.tar.gz
 [ $? -ne 0 ] && net_error "tty0tty sources"
-cd $BDIR
-tar zxf tty0tty-1.2.tar.gz
-cd tty0tty-1.2/module
+cd ${SRC_DIR}
+tar zxf tty0tty-${TTY0TTY_VERSION}.tar.gz
+cd tty0tty-${TTY0TTY_VERSION}/module
 make
 sudo cp tty0tty.ko /lib/modules/$(uname -r)/kernel/drivers/misc/
 sudo depmod
@@ -68,7 +79,7 @@ After=network.target
 
 [Service]
 EnvironmentFile=-/etc/vmodem.conf
-ExecStart=/usr/bin/tcpser -d /dev/tnt0 -S \$BPS -l \$LOG_LEVEL -L \$LOG_FILE
+ExecStart=/usr/local/bin/tcpser -d /dev/tnt0 -S \$BPS -l \$LOG_LEVEL -L \$LOG_FILE
 ExecStartPre=/usr/bin/chmod 666 /dev/tnt0
 ExecStartPre=/usr/bin/chmod 666 /dev/tnt1
 ExecStartPost=/bin/sleep 1
@@ -82,8 +93,8 @@ EOF
 sudo mv vmodem.service /lib/systemd/system
 sudo mv vmodem.conf /etc
 sudo chmod 666 /etc/vmodem.conf
-cd ~/
-rm -rf $BDIR
+
+Cleanup
 
 sudo systemctl enable --now vmodem.service
 
