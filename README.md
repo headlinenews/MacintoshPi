@@ -1,4 +1,7 @@
-# NOTE: This is not the official MacintoshPi project.
+# NOTE
+
+* This is *not* the official MacintoshPi project.
+* Work in progress.  Most likely it would not work on your Raspberry Pi.
 
 # MacintoshPi
 
