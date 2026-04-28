@@ -1,3 +1,5 @@
+# NOTE: This is not the official MacintoshPi project.
+
 # MacintoshPi
 
 MacintoshPi is a small project that allows running full-screen versions of Apple's *Mac OS 7*, *Mac OS 8* and *Mac OS 9* with sound, active Internet connection and modem emulation under *Raspberry Pi*. All this without the X.org manager, only a multimedia SDL2 library and from the CLI / *Raspberry Pi OS (Legacy)*. This lets emulators use full power of *Raspberry Pi*, making them more stable and useful in combination with additional retro-software. 
